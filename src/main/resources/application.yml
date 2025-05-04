@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: ddakdae
+
+  datasource:
+    url: jdbc:mysql://34.22.106.139:3306/ddakdae?serverTimezone=Asia/Seoul&useSSL=false
+    username: root
+    password: 4idiots!123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # 또는 validate, create, create-drop 중 하나
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+
+seoul:
+  api:
+    key: 514d5766676c736a34374c6a6a7457
+    base-url: http://openapi.seoul.go.kr:8088
+    format: json
+    service: GetParkInfo
