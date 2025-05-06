@@ -23,3 +23,13 @@ seoul:
     base-url: http://openapi.seoul.go.kr:8088
     format: json
     service: GetParkInfo
+
+
+kakao:
+   api:
+     key: cb27c0d94cbfb9a01625c760ee35563b
+
+naver:
+  api:
+    client-id: snkdaxv76d
+    client-secret: RjCQvQ4oR2nbehLXrhEhQG1bGqRHt7v4cLnlxHQl

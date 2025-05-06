@@ -29,7 +29,7 @@ public class GeocodeService {
 
     // VWorld API 키와 도메인
     private static final String API_KEY = "1CA725C9-1389-3EBE-A3DA-7C17E2DAFB2C";
-    private static final String DOMAIN = "www.vworld.kr";
+    private static final String DOMAIN = "http://34.64.46.206:30081";
     private static final String API_URL = "http://apis.vworld.kr/new2coord.do";
 
     // 주소를 입력받아 위도와 경도를 반환하는 메인 메서드
