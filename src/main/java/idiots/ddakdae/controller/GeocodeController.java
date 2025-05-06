@@ -5,8 +5,11 @@ import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.AddressDto;
 import idiots.ddakdae.dto.response.ResponseDto;
 import idiots.ddakdae.service.GeocodeService;
+import idiots.ddakdae.service.KakaoMapService;
+import idiots.ddakdae.service.NaverMapService;
 import idiots.ddakdae.service.ParkingLotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,8 @@ public class GeocodeController {
 
     private final GeocodeService geocodeService;
     private final ParkingLotService parkingLotService;
+    private final KakaoMapService kakaoMapService;
+    private final NaverMapService naverMapService;
 
 
     @PostMapping("/geocode")
@@ -37,5 +42,11 @@ public class GeocodeController {
 
         // 클라이언트에게 주차장 정보 반환
         return ResponseEntity.ok().body(ResponseDto.success(parkingLots));
+    }
+
+
+    @GetMapping("/geocode")
+    public String getLatLng(@RequestParam String address) {
+        return naverMapService.getCoordinates(address);
     }
 }
