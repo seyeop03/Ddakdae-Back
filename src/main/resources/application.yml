@@ -33,3 +33,7 @@ naver:
   api:
     client-id: snkdaxv76d
     client-secret: RjCQvQ4oR2nbehLXrhEhQG1bGqRHt7v4cLnlxHQl
+
+  search:
+    client-id: ZQBFRcj16ZNtTSn2sRZG
+    client-secret: E6b2dIQptk

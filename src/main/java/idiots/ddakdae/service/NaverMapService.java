@@ -3,6 +3,8 @@ package idiots.ddakdae.service;
 // NaverMapService.java
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import idiots.ddakdae.dto.response.NaverApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,8 +12,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class NaverMapService {
 
     @Value("${naver.api.client-id}")
@@ -20,8 +27,14 @@ public class NaverMapService {
     @Value("${naver.api.client-secret}")
     private String clientSecret;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${naver.search.client-id}")
+    private String clientIdV2;
+
+    @Value("${naver.search.client-secret}")
+    private String clientSecretV2;
+
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     public String getCoordinates(String address) {
         String url = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=" + address;
@@ -49,6 +62,38 @@ public class NaverMapService {
             }
         }
         return "No coordinates found";
+    }
+
+    public Object searchLocal(String query, int display, int start, String sort) {
+        String url = UriComponentsBuilder.fromHttpUrl("https://openapi.naver.com")
+                .path("/v1/search/local.json")
+                .queryParam("query", query)
+                .queryParam("display", display)
+                .queryParam("start", start)
+                .queryParam("sort", sort)
+                .build()
+                .toUriString();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Naver-Client-Id", clientIdV2);
+        headers.add("X-Naver-Client-Secret", clientSecretV2);
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<NaverApiResponse> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                NaverApiResponse.class
+        );
+
+
+        String mapx = response.getBody().getItems().get(0).mapx;
+        String mapy = response.getBody().getItems().get(0).mapy;
+
+        System.out.println(mapx + ", " + mapy);
+
+        return response.getBody();
     }
 }
 

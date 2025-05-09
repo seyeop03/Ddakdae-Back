@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -49,4 +50,16 @@ public class GeocodeController {
     public String getLatLng(@RequestParam String address) {
         return naverMapService.getCoordinates(address);
     }
+
+    @GetMapping("/search/local")
+    public ResponseEntity<Object> search(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "5") int display,
+            @RequestParam(defaultValue = "1") int start,
+            @RequestParam(defaultValue = "random") String sort) {
+        Object result = naverMapService.searchLocal(query, display, start, sort);
+        return ResponseEntity.ok(result);
+    }
+
+
 }
