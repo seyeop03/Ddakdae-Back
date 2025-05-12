@@ -2,7 +2,7 @@ spring:
   application:
     name: ddakdae
   config:
-    import: optional:application-secret-api.yml
+    import: classpath:application-secret-api.yml
 
   jpa:
     hibernate:
