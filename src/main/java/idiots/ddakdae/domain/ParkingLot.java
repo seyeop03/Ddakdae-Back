@@ -136,4 +136,10 @@ public class ParkingLot {
 
     /** 경도 */
     private BigDecimal lot;
+
+    /** 구 */
+    private String gu;
+
+    /** 동 */
+    private String dong;
 }

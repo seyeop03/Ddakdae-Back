@@ -3,9 +3,11 @@ package idiots.ddakdae.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import idiots.ddakdae.domain.ParkingLot;
+import idiots.ddakdae.dto.request.MapBoundsRequest;
 import idiots.ddakdae.dto.response.ParkingLotResponse;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ParkingLotService {
@@ -36,11 +39,27 @@ public class ParkingLotService {
         parkingLotRepository.saveAll(lots);
     }
 
+    public List<?> getClusteredData(MapBoundsRequest req) {
+        double swLat = req.getSwLat();
+        double swLot = req.getSwLot();
+        double neLat = req.getNeLat();
+        double neLot = req.getNeLot();
+        int zoomLevel = req.getZoomLevel();
+
+        if (zoomLevel <= 12) {
+            return parkingLotRepository.groupByGu(swLat, neLat, swLot, neLot);
+        } else if (zoomLevel <= 14) {
+            return parkingLotRepository.groupByDong(swLat, neLat, swLot, neLot);
+        } else {
+            return parkingLotRepository.getMarkers(swLat, neLat, swLot, neLot);
+        }
+    }
+
     public List<ParkingLot> getParkingLotsWithinRadius(double latitude, double longitude, int radiusMeters) {
         double radiusKm = radiusMeters / 1000.0; // 미터를 킬로미터로 변환
         List<ParkingLot> parkingLots = parkingLotRepository.findParkingLotsWithinRadius(latitude, longitude, radiusKm);
-        System.out.println("Service: Found " + parkingLots.size() + " parking lots for lat=" + latitude +
-                ", lon=" + longitude + ", radius=" + radiusKm + "km");
+        log.info("Service: Found {}, parking lots for lat= {}, lon= {}, radius= {}km",
+                parkingLots.size(), latitude, longitude, radiusKm);
         return parkingLots;
     }
 }

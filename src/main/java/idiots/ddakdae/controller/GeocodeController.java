@@ -3,11 +3,13 @@ package idiots.ddakdae.controller;
 import idiots.ddakdae.domain.Coordinates;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.AddressDto;
+import idiots.ddakdae.dto.request.MapBoundsRequest;
 import idiots.ddakdae.dto.response.ResponseDto;
 import idiots.ddakdae.service.GeocodeService;
 import idiots.ddakdae.service.KakaoMapService;
 import idiots.ddakdae.service.NaverMapService;
 import idiots.ddakdae.service.ParkingLotService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,12 @@ public class GeocodeController {
     private final KakaoMapService kakaoMapService;
     private final NaverMapService naverMapService;
 
+    @Operation(summary = "첫 메인화면 지도 클러스터링", description = "프론트에서 요청 파라미터 유의, 줌레벨에 따라 구/동/거리 다름")
+    @PostMapping("/pklt")
+    public ResponseEntity<?> getClusteredPkltData(@RequestBody MapBoundsRequest mapBoundsRequest) {
+        List<?> clusteredData = parkingLotService.getClusteredData(mapBoundsRequest);
+        return ResponseEntity.ok(clusteredData);
+    }
 
     @PostMapping("/geocode")
     public ResponseEntity<?> geocode(@RequestBody AddressDto addressDto,

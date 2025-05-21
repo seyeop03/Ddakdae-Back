@@ -17,4 +17,27 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
     List<ParkingLot> findParkingLotsWithinRadius(@Param("lat") double lat,
                                                  @Param("lon") double lon,
                                                  @Param("radius") double radius);
+
+    @Query("""
+        SELECT p.gu, COUNT(p), AVG(p.lat), AVG(p.lot)
+        FROM ParkingLot p
+        WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
+        GROUP BY p.gu
+    """)
+    List<?> groupByGu(double swLat, double neLat, double swLot, double neLot);
+
+    @Query("""
+        SELECT p.dong, COUNT(p), AVG(p.lat), AVG(p.lot)
+        FROM ParkingLot p
+        WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
+        GROUP BY p.dong
+    """)
+    List<?> groupByDong(double swLat, double neLat, double swLot, double neLot);
+
+    @Query("""
+        select p
+        FROM ParkingLot p
+        WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
+    """)
+    List<?> getMarkers(double swLat, double neLat, double swLot, double neLot);
 }
