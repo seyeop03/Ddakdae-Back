@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import idiots.ddakdae.dto.response.NaverApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NaverMapService {
@@ -86,12 +88,6 @@ public class NaverMapService {
                 requestEntity,
                 NaverApiResponse.class
         );
-
-
-        String mapx = response.getBody().getItems().get(0).mapx;
-        String mapy = response.getBody().getItems().get(0).mapy;
-
-        System.out.println(mapx + ", " + mapy);
 
         return response.getBody();
     }

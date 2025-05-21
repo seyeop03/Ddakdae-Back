@@ -11,6 +11,7 @@ import idiots.ddakdae.service.NaverMapService;
 import idiots.ddakdae.service.ParkingLotService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class GeocodeController {
                 coordinates.getLatitude(),
                 radius
         );
-        System.out.println("Found " + parkingLots.size() + " parking lots within " + radius + " meters");
+        log.info("Found {} parking lots within {} meters", parkingLots.size(), radius);
 
         // 클라이언트에게 주차장 정보 반환
         return ResponseEntity.ok().body(ResponseDto.success(parkingLots));
@@ -59,6 +61,7 @@ public class GeocodeController {
         return naverMapService.getCoordinates(address);
     }
 
+    @Operation(summary = "키워드 검색 API", description = "기본값 1페이지당 5개씩, 랜덤 정렬")
     @GetMapping("/search/local")
     public ResponseEntity<Object> search(
             @RequestParam String query,
