@@ -1,6 +1,7 @@
 package idiots.ddakdae.repository;
 
 import idiots.ddakdae.domain.ParkingLot;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,5 +40,5 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
     """)
-    List<?> getMarkers(double swLat, double neLat, double swLot, double neLot);
+    List<?> getMarkers(double swLat, double neLat, double swLot, double neLot, Pageable pageable);
 }

@@ -5,13 +5,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.MapBoundsRequest;
 import idiots.ddakdae.dto.response.ParkingLotResponse;
+import idiots.ddakdae.infra.redis.RedisCacheKeyGenerator;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,6 +27,7 @@ public class ParkingLotService {
 
     private final ParkingLotRepository parkingLotRepository;
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void importJsonData(String jsonFilePath) throws IOException {
         File file = new File(jsonFilePath);
@@ -40,19 +45,27 @@ public class ParkingLotService {
     }
 
     public List<?> getClusteredData(MapBoundsRequest req) {
-        double swLat = req.getSwLat();
-        double swLot = req.getSwLot();
-        double neLat = req.getNeLat();
-        double neLot = req.getNeLot();
-        int zoomLevel = req.getZoomLevel();
+        String key = RedisCacheKeyGenerator.generateKey(
+                req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot(), req.getZoomLevel());
 
-        if (zoomLevel <= 12) {
-            return parkingLotRepository.groupByGu(swLat, neLat, swLot, neLot);
-        } else if (zoomLevel <= 14) {
-            return parkingLotRepository.groupByDong(swLat, neLat, swLot, neLot);
-        } else {
-            return parkingLotRepository.getMarkers(swLat, neLat, swLot, neLot);
+        List<?> cached = (List<?>) redisTemplate.opsForValue().get(key);
+        if (Objects.nonNull(cached)) {
+            return cached;
         }
+
+        List<?> result;
+        int zoomLevel = req.getZoomLevel();
+        if (zoomLevel <= 12) {
+            result = parkingLotRepository.groupByGu(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot());
+        } else if (zoomLevel <= 14) {
+            result = parkingLotRepository.groupByDong(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot());
+        } else {
+            result = parkingLotRepository.getMarkers(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot(),
+                    PageRequest.of(0, 300));
+        }
+
+        redisTemplate.opsForValue().set(key, result, Duration.ofSeconds(30));
+        return result;
     }
 
     public List<ParkingLot> getParkingLotsWithinRadius(double latitude, double longitude, int radiusMeters) {
