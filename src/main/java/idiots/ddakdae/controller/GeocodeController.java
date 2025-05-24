@@ -5,11 +5,18 @@ import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.AddressDto;
 import idiots.ddakdae.dto.request.MapBoundsRequest;
 import idiots.ddakdae.dto.response.ResponseDto;
+import idiots.ddakdae.dto.response.clustering.DongClusterDto;
+import idiots.ddakdae.dto.response.clustering.GuClusterDto;
+import idiots.ddakdae.dto.response.clustering.MarkerDto;
 import idiots.ddakdae.service.GeocodeService;
 import idiots.ddakdae.service.KakaoMapService;
 import idiots.ddakdae.service.NaverMapService;
 import idiots.ddakdae.service.ParkingLotService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +37,21 @@ public class GeocodeController {
     private final KakaoMapService kakaoMapService;
     private final NaverMapService naverMapService;
 
-    @Operation(summary = "첫 메인화면 지도 클러스터링", description = "프론트에서 요청 파라미터 유의, 줌레벨에 따라 구/동/거리 다름")
+    @Operation(
+            summary = "첫 메인화면 지도 클러스터링",
+            description = "줌레벨에 따라 구/동/마커 DTO 중 하나를 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "클러스터링 결과",
+                            content = @Content(array = @ArraySchema(schema = @Schema(oneOf = {
+                                    GuClusterDto.class,
+                                    DongClusterDto.class,
+                                    MarkerDto.class
+                            })))
+                    )
+            }
+    )
     @PostMapping("/pklt")
     public ResponseEntity<?> getClusteredPkltData(@RequestBody MapBoundsRequest mapBoundsRequest) {
         List<?> clusteredData = parkingLotService.getClusteredData(mapBoundsRequest);
@@ -71,6 +92,4 @@ public class GeocodeController {
         Object result = naverMapService.searchLocal(query, display, start, sort);
         return ResponseEntity.ok(result);
     }
-
-
 }

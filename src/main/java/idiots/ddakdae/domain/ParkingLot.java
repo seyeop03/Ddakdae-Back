@@ -142,4 +142,11 @@ public class ParkingLot {
 
     /** 동 */
     private String dong;
+
+    /** 1시간 단위 당 기본 주차 요금 */
+    private Integer hourlyPrice;
+
+    /** 10분 단위 당 추가 요금 */
+    @Column(name = "add_crg_10_mnt")
+    private Integer addCrg10Mnt;
 }

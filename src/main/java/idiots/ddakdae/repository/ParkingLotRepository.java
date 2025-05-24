@@ -1,6 +1,9 @@
 package idiots.ddakdae.repository;
 
 import idiots.ddakdae.domain.ParkingLot;
+import idiots.ddakdae.dto.response.clustering.DongClusterDto;
+import idiots.ddakdae.dto.response.clustering.GuClusterDto;
+import idiots.ddakdae.dto.response.clustering.MarkerDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,25 +23,34 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
                                                  @Param("radius") double radius);
 
     @Query("""
-        SELECT p.gu, COUNT(p), AVG(p.lat), AVG(p.lot)
+        SELECT 
+        new idiots.ddakdae.dto.response.clustering.GuClusterDto(
+            p.gu, COUNT(p), AVG(p.lat), AVG(p.lot)
+        )
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
         GROUP BY p.gu
     """)
-    List<?> groupByGu(double swLat, double neLat, double swLot, double neLot);
+    List<GuClusterDto> groupByGu(double swLat, double neLat, double swLot, double neLot);
 
     @Query("""
-        SELECT p.dong, COUNT(p), AVG(p.lat), AVG(p.lot)
+        SELECT 
+        new idiots.ddakdae.dto.response.clustering.DongClusterDto(
+            p.dong, COUNT(p), AVG(p.lat), AVG(p.lot)
+        )
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
         GROUP BY p.dong
     """)
-    List<?> groupByDong(double swLat, double neLat, double swLot, double neLot);
+    List<DongClusterDto> groupByDong(double swLat, double neLat, double swLot, double neLot);
 
     @Query("""
-        select p
+        select 
+        new idiots.ddakdae.dto.response.clustering.MarkerDto(
+            p.pkltNm, p.pkltKndNm, p.hourlyPrice, p.addCrg10Mnt, p.lat, p.lot
+        )
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
     """)
-    List<?> getMarkers(double swLat, double neLat, double swLot, double neLot, Pageable pageable);
+    List<MarkerDto> getMarkers(double swLat, double neLat, double swLot, double neLot, Pageable pageable);
 }
