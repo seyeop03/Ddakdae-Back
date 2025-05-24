@@ -47,7 +47,7 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
     @Query("""
         select 
         new idiots.ddakdae.dto.response.clustering.MarkerDto(
-            p.pkltNm, p.pkltKndNm, p.hourlyPrice, p.addCrg10Mnt, p.lat, p.lot
+            p.pkltNm, p.pkltKndNm, p.hourlyPrice, p.addCrg10Mnt, p.lat, p.lot, p.prkCrg
         )
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot

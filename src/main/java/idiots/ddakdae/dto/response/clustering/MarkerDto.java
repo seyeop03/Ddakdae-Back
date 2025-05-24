@@ -30,4 +30,7 @@ public class MarkerDto {
 
     @Schema(description = "경도")
     private BigDecimal lot;
+
+    @Schema(description = "기본 요금 (분단위)")
+    private Integer prkCrg;
 }
