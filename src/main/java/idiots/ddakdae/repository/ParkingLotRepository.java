@@ -1,15 +1,15 @@
 package idiots.ddakdae.repository;
 
 import idiots.ddakdae.domain.ParkingLot;
-import idiots.ddakdae.dto.response.clustering.DongClusterDto;
-import idiots.ddakdae.dto.response.clustering.GuClusterDto;
-import idiots.ddakdae.dto.response.clustering.MarkerDto;
+import idiots.ddakdae.dto.response.clustering.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
 
@@ -53,4 +53,49 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
     """)
     List<MarkerDto> getMarkers(double swLat, double neLat, double swLot, double neLot, Pageable pageable);
+
+    @Query("""
+        SELECT new idiots.ddakdae.dto.response.clustering.NearbyParkingDto(
+            p.id,
+            p.pkltNm,
+            p.addr,
+            p.pkltKndNm,
+            p.tpkct,
+            p.chgdFreeNm,
+            p.nghtFreeOpnYnName,
+            p.wdOperBgngTm,
+            p.wdOperEndTm,
+            p.weOperBgngTm,
+            p.weOperEndTm,
+            p.lhldyBgng,
+            p.lhldy
+        )
+        FROM ParkingLot p
+        WHERE ST_Distance_Sphere(point(p.lot, p.lat), point(:lot, :lat)) <= :radius
+    """)
+    Page<NearbyParkingDto> findNearbyParkingLots(double lat, double lot, int radius, Pageable pageable);
+
+    @Query("""
+        SELECT new idiots.ddakdae.dto.response.clustering.NearbyParkingDetailDto(
+            p.id,
+            p.pkltNm,
+            p.addr,
+            p.pkltKndNm,
+            p.tpkct,
+            p.chgdFreeNm,
+            p.nghtFreeOpnYnName,
+            p.wdOperBgngTm,
+            p.wdOperEndTm,
+            p.weOperBgngTm,
+            p.weOperEndTm,
+            p.lhldyBgng,
+            p.lhldy,
+            p.hourlyPrice,
+            p.addCrg10Mnt,
+            p.mntlCmutCrg
+        )
+        FROM ParkingLot p
+        WHERE p.id = :id
+    """)
+    Optional<NearbyParkingDetailDto> findParkingLotDetailById(Long id);
 }

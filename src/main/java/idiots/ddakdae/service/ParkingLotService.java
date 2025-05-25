@@ -4,12 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.MapBoundsRequest;
+import idiots.ddakdae.dto.request.NearbyParkingRequest;
 import idiots.ddakdae.dto.response.ParkingLotResponse;
+import idiots.ddakdae.dto.response.clustering.NearbyParkingDetailDto;
+import idiots.ddakdae.dto.response.clustering.NearbyParkingDto;
 import idiots.ddakdae.infra.redis.RedisCacheKeyGenerator;
 import idiots.ddakdae.repository.ParkingLotRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -74,5 +80,17 @@ public class ParkingLotService {
         log.info("Service: Found {}, parking lots for lat= {}, lon= {}, radius= {}km",
                 parkingLots.size(), latitude, longitude, radiusKm);
         return parkingLots;
+    }
+
+    public Page<NearbyParkingDto> getNearbyParkingLots(NearbyParkingRequest req) {
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
+        return parkingLotRepository.findNearbyParkingLots(
+            req.getLat(), req.getLot(), req.getRadius(), pageable
+        );
+    }
+
+    public NearbyParkingDetailDto getParkingLotDetail(Long id) {
+        return parkingLotRepository.findParkingLotDetailById(id)
+                .orElseThrow(() -> new EntityNotFoundException("주차장 없음"));
     }
 }

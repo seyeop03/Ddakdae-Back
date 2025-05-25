@@ -4,10 +4,9 @@ import idiots.ddakdae.domain.Coordinates;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.AddressDto;
 import idiots.ddakdae.dto.request.MapBoundsRequest;
+import idiots.ddakdae.dto.request.NearbyParkingRequest;
 import idiots.ddakdae.dto.response.ResponseDto;
-import idiots.ddakdae.dto.response.clustering.DongClusterDto;
-import idiots.ddakdae.dto.response.clustering.GuClusterDto;
-import idiots.ddakdae.dto.response.clustering.MarkerDto;
+import idiots.ddakdae.dto.response.clustering.*;
 import idiots.ddakdae.service.GeocodeService;
 import idiots.ddakdae.service.KakaoMapService;
 import idiots.ddakdae.service.NaverMapService;
@@ -19,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +56,37 @@ public class GeocodeController {
     public ResponseEntity<?> getClusteredPkltData(@RequestBody MapBoundsRequest mapBoundsRequest) {
         List<?> clusteredData = parkingLotService.getClusteredData(mapBoundsRequest);
         return ResponseEntity.ok(clusteredData);
+    }
+    @Operation(
+            summary = "주차장 목록",
+            description = "주차장 목록 API, 클릭 시 상세정보 API로 연결됨",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "주차장 목록 결과",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = NearbyParkingDto.class)))
+                    )
+            }
+    )
+    @PostMapping("/nearby")
+    public ResponseEntity<?> getNearbyParkingLots(@RequestBody NearbyParkingRequest req) {
+        Page<NearbyParkingDto> nearbyParkingLots = parkingLotService.getNearbyParkingLots(req);
+        return ResponseEntity.ok(nearbyParkingLots);
+    }
+    @Operation(
+            summary = "주차장 상세 목록",
+            description = "주차장 상세 목록 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "주차장 상세 목록 결과",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = NearbyParkingDetailDto.class)))
+                    )
+            }
+    )
+    @GetMapping("/nearby/{id}")
+    public ResponseEntity<NearbyParkingDetailDto> getDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(parkingLotService.getParkingLotDetail(id));
     }
 
     @PostMapping("/geocode")
