@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,17 +36,24 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String snsEmail = extractEmail(provider, attributes);
         String name = extractName(provider, attributes);
 
-        log.info("snsEmail: {}, name: {}", snsEmail, name);
+        log.info("provider: {}, snsId: {}, snsEmail: {}, name: {}", provider, snsId, snsEmail, name);
 
-        Customer customer = customerRepository.findBySnsTypeAndSnsId(provider, snsId)
-                .orElseGet(() -> {
-                    Customer newUser = new Customer();
-                    newUser.setSnsType(provider);
-                    newUser.setSnsId(snsId);
-                    newUser.setSnsEmail(snsEmail);
-                    newUser.setNickName(name);
-                    return customerRepository.save(newUser);
-                });
+        Optional<Customer> optionalCustomer = customerRepository.findBySnsEmail(snsEmail);
+        Customer customer;
+
+        if (optionalCustomer.isPresent()) {
+            customer = optionalCustomer.get();
+            customer.setSnsId(snsId);
+            customer.setSnsType(provider);
+        } else {
+            customer = Customer.builder()
+                    .snsId(snsId)
+                    .snsEmail(snsEmail)
+                    .nickName(name)
+                    .snsType(provider)
+                    .build();
+        }
+        customerRepository.save(customer);
 
         // attributes에 email 추가 (Spring Security에서 nameAttributeKey로 사용하기 위함)
         Map<String, Object> customAttributes = new HashMap<>(attributes);

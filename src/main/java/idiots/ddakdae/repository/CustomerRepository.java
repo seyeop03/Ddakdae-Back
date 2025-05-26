@@ -9,5 +9,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByEmail(String email); // 로컬용
 
     Optional<Customer> findBySnsTypeAndSnsId(String snsType, String snsId); // SNS용
+
+    Optional<Customer> findBySnsEmail(String snsEmail); // SNS용
 }
 

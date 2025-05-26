@@ -27,7 +27,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String token = jwtProvider.createToken(customer.getId());
 
-//        response.sendRedirect("http://localhost:5173/login/callback?token=" + token);
-        response.sendRedirect("http://ddak-dae.kro.kr/login/callback?token=" + token);
+        String referer = request.getHeader("Referer"); // or Origin
+        String redirectBase;
+
+        if (referer != null && referer.contains("ddak-dae.kro.kr")) {
+            redirectBase = "http://ddak-dae.kro.kr";
+        } else {
+            redirectBase = "http://localhost:5173";
+        }
+
+        response.sendRedirect(redirectBase + "/login/callback?token=" + token);
     }
 }
