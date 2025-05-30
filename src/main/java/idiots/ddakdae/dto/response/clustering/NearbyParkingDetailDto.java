@@ -1,11 +1,10 @@
 package idiots.ddakdae.dto.response.clustering;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "거리 마커에서 주차장 목록 상세정보 DTO, 주차장 목록에서 사진 or 제목 클릭 시 상세정보")

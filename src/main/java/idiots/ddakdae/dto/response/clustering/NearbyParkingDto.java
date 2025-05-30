@@ -2,13 +2,15 @@ package idiots.ddakdae.dto.response.clustering;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "거리 마커에서 주차장 목록 DTO, 범위 조절 가능")
+@Schema(description = "거리 마커에서 주차장 목록 DTO")
 public class NearbyParkingDto {
 
     @Schema(description = "주차장 식별 ID")
