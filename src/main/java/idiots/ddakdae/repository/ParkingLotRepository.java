@@ -51,6 +51,7 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
         )
         FROM ParkingLot p
         WHERE p.lat BETWEEN :swLat AND :neLat AND p.lot BETWEEN :swLot AND :neLot
+        AND p.hourlyPrice is not null
     """)
     List<MarkerDto> getMarkers(double swLat, double neLat, double swLot, double neLot, Pageable pageable);
 
