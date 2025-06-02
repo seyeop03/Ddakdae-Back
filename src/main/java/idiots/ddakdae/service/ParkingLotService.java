@@ -66,8 +66,7 @@ public class ParkingLotService {
         } else if (zoomLevel <= 14) {
             result = parkingLotRepository.groupByDong(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot());
         } else {
-            result = parkingLotRepository.getMarkers(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot(),
-                    PageRequest.of(0, 300));
+            result = parkingLotRepository.getMarkers(req.getSwLat(), req.getNeLat(), req.getSwLot(), req.getNeLot());
         }
 
         redisTemplate.opsForValue().set(key, result, Duration.ofSeconds(30));
