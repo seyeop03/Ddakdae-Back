@@ -21,6 +21,9 @@ public class Customer {
     /** 로컬 이메일 */
     private String email;
 
+    /** 로컬 패스워드 */
+    private String password;
+
     /** 닉네임 */
     private String nickName;
 
