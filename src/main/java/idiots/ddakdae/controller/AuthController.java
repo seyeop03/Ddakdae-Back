@@ -24,7 +24,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(
             summary = "로컬 로그인 API",
-            description = "이메일 패스워드 필수, 현재 회원가입 기능이 안 되어있으므로 요청파라미터 하드코딩 필요",
+            description = "이메일 패스워드 필수",
             responses = {
                     @ApiResponse(
                             responseCode = "200",

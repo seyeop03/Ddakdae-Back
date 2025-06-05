@@ -26,8 +26,10 @@ public class CustomerService {
     private String bucketName;
 
     public void signup(SignUpRequestDto signUpRequestDto, MultipartFile profileImage) throws IOException {
-        String imagePath = profileImage != null ?
-                uploader.upload(bucketName, UUID.randomUUID() + "-" + profileImage.getOriginalFilename(), profileImage) : null;
+
+        String objectName = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+        uploader.upload(bucketName, objectName, profileImage);
+        String imagePath = objectName;
 
         Customer customer = Customer.builder()
                 .email(signUpRequestDto.getEmail())

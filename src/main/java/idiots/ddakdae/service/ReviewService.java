@@ -34,8 +34,9 @@ public class ReviewService {
     public Review saveReview(Long customerId, ReviewRequestDto reviewRequestDto, MultipartFile image) throws IOException {
         Customer customer = customerRepository.findById(customerId).orElseThrow();
         ParkingLot parkingLot = parkingLotRepository.findById(reviewRequestDto.getPlId()).orElseThrow();
-        String imagePath = image != null ?
-                uploader.upload(bucketName, UUID.randomUUID() + "-" + image.getOriginalFilename(), image) : null;
+        String objectName = UUID.randomUUID() + "-" + image.getOriginalFilename();
+        uploader.upload(bucketName, objectName, image);
+        String imagePath = objectName;
 
         if (image == null || image.isEmpty()) {
             log.warn("️업로드된 이미지가 없습니다.");
