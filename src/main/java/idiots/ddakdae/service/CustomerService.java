@@ -3,8 +3,11 @@ package idiots.ddakdae.service;
 import idiots.ddakdae.config.GCSUploader;
 import idiots.ddakdae.domain.Customer;
 import idiots.ddakdae.dto.request.SignUpRequestDto;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -27,9 +31,17 @@ public class CustomerService {
 
     public void signup(SignUpRequestDto signUpRequestDto, MultipartFile profileImage) throws IOException {
 
-        String objectName = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-        uploader.upload(bucketName, objectName, profileImage);
-        String imagePath = objectName;
+        String imagePath = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                String objectName = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+                uploader.upload(bucketName, objectName, profileImage);
+                imagePath = objectName;
+            } catch (IOException e) {
+                log.warn("프로필 이미지 업로드 실패: {}", e.getMessage());
+                throw new BizException(ErrorCode.IMAGE_UPLOAD_ERROR);
+            }
+        }
 
         Customer customer = Customer.builder()
                 .email(signUpRequestDto.getEmail())

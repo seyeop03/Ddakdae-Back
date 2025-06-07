@@ -8,6 +8,8 @@ import idiots.ddakdae.dto.request.NearbyParkingRequest;
 import idiots.ddakdae.dto.response.ParkingLotResponse;
 import idiots.ddakdae.dto.response.clustering.NearbyParkingDetailDto;
 import idiots.ddakdae.dto.response.clustering.NearbyParkingDto;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.infra.redis.RedisCacheKeyGenerator;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -90,6 +92,6 @@ public class ParkingLotService {
 
     public NearbyParkingDetailDto getParkingLotDetail(Long id) {
         return parkingLotRepository.findParkingLotDetailById(id)
-                .orElseThrow(() -> new EntityNotFoundException("주차장 없음"));
+                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_PKLT));
     }
 }

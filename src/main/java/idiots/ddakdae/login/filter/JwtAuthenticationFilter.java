@@ -1,8 +1,11 @@
 package idiots.ddakdae.login.filter;
 
 import idiots.ddakdae.domain.Customer;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.login.JwtProvider;
 import idiots.ddakdae.repository.CustomerRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,13 +51,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Authentication auth = new UsernamePasswordAuthenticationToken(
                         customer, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
                 );
-//                log.info("SecurityContext principal class: {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal().getClass());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 log.info("Authentication success: {}", customer.getNickName());
+            } catch (ExpiredJwtException e) {
+                log.warn("JWT expired: {}", e.getMessage());
+                response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"TOKEN_EXPIRED\", \"message\": \"로그인 세션이 만료되었습니다.\"}");
+                return;
             } catch (Exception e) {
                 log.warn("JWT Authentication Failed: {}", e.getMessage());
+                response.setCharacterEncoding("UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"INVALID_TOKEN\", \"message\": \"유효하지 않은 토큰입니다.\"}");
+                return;
             }
         }
 
