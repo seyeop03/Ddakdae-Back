@@ -11,7 +11,7 @@ import lombok.*;
 public class NearbyParkingDetailDto {
 
     @Schema(description = "주차장 식별 ID")
-    private Long id;
+    private Long plId;
 
     @Schema(description = "주차장 명")
     private String pkltNm;

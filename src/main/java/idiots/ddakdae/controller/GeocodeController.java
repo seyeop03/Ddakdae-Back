@@ -84,9 +84,9 @@ public class GeocodeController {
                     )
             }
     )
-    @GetMapping("/nearby/{id}")
-    public ResponseEntity<NearbyParkingDetailDto> getDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(parkingLotService.getParkingLotDetail(id));
+    @GetMapping("/nearby/{plId}")
+    public ResponseEntity<NearbyParkingDetailDto> getDetail(@PathVariable Long plId) {
+        return ResponseEntity.ok(parkingLotService.getParkingLotDetail(plId));
     }
 
     @PostMapping("/geocode")

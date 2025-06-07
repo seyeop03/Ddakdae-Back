@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    // USER
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
+
     // Favorite
-    NOTFOUND_USER(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
-    NOTFOUND_PKLT(HttpStatus.NOT_FOUND, "해당 주차장이 존재하지 않습니다."),
-    NOTFOUND_FAVORITE(HttpStatus.NOT_FOUND, "해당 찜 내역이 존재하지 않습니다."),
+    NOT_FOUND_PKLT(HttpStatus.NOT_FOUND, "해당 주차장이 존재하지 않습니다."),
+    NOT_FOUND_FAVORITE(HttpStatus.NOT_FOUND, "해당 찜 내역이 존재하지 않습니다."),
     EXIST_PKLT_FAVORITE(HttpStatus.BAD_REQUEST, "이미 찜한 주차장입니다."),
 
     // Image upload

@@ -48,6 +48,10 @@ public class ReviewController {
         return ResponseEntity.ok(savedReview.getReviewId());
     }
 
+    @Operation(summary = "특정 주차장 리뷰 목록 API", description = "리뷰에 대한 정보들, DTO 참조")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공")
+    })
     @GetMapping("/{plId}")
     public ResponseEntity<?> getReviews(@PathVariable Long plId) {
         return ResponseEntity.ok(reviewService.getReviews(plId));

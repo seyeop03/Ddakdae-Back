@@ -78,7 +78,7 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
 
     @Query("""
         SELECT new idiots.ddakdae.dto.response.clustering.NearbyParkingDetailDto(
-            p.id,
+            p.plId,
             p.pkltNm,
             p.addr,
             p.pkltKndNm,
@@ -96,7 +96,7 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
             p.mntlCmutCrg
         )
         FROM ParkingLot p
-        WHERE p.id = :id
+        WHERE p.plId = :id
     """)
     Optional<NearbyParkingDetailDto> findParkingLotDetailById(Long id);
 }

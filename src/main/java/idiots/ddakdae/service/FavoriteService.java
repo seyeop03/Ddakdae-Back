@@ -25,9 +25,9 @@ public class FavoriteService {
 
     public void addFavorite(Long customerId, Long parkingLotId) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_USER));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_USER));
         ParkingLot parkingLot = parkingLotRepository.findById(parkingLotId)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_PKLT));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_PKLT));
 
         if (favoriteRepository.existsByCustomerAndParkingLot(customer, parkingLot)) {
             throw new BizException(ErrorCode.EXIST_PKLT_FAVORITE);
@@ -44,19 +44,19 @@ public class FavoriteService {
 
     public void removeFavorite(Long customerId, Long parkingLotId) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_USER));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_USER));
         ParkingLot parkingLot = parkingLotRepository.findById(parkingLotId)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_PKLT));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_PKLT));
 
         Favorite favorite = favoriteRepository.findByCustomerAndParkingLot(customer, parkingLot)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_FAVORITE));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_FAVORITE));
 
         favoriteRepository.delete(favorite);
     }
 
     public List<NearbyParkingDto> getFavorites(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_USER));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_USER));
 
         return favoriteRepository.findAllByCustomer(customer).stream()
                 .map(fav -> {

@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(
-            summary = "로컬 로그인 API",
+            summary = "폼 로그인 API",
             description = "이메일 패스워드 필수",
             responses = {
                     @ApiResponse(

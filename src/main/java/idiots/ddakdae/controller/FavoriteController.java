@@ -77,7 +77,7 @@ public class FavoriteController {
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(
             summary = "로그인 사용자 찜 목록 조회 API",
-            description = "특정 사용자에 대한 찜 목록, JWT & parkingLotId 필수, 주차장 DTO 반환",
+            description = "특정 사용자에 대한 찜 목록, JWT 필수, 주차장 DTO 반환",
             responses = {
                     @ApiResponse(
                             responseCode = "200",

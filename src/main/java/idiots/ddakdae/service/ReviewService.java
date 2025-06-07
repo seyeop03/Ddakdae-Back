@@ -5,6 +5,8 @@ import idiots.ddakdae.domain.Customer;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.domain.Review;
 import idiots.ddakdae.dto.request.ReviewRequestDto;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.repository.CustomerRepository;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import idiots.ddakdae.repository.ReviewRepository;
@@ -32,14 +34,22 @@ public class ReviewService {
     private String bucketName;
 
     public Review saveReview(Long customerId, ReviewRequestDto reviewRequestDto, MultipartFile image) throws IOException {
-        Customer customer = customerRepository.findById(customerId).orElseThrow();
-        ParkingLot parkingLot = parkingLotRepository.findById(reviewRequestDto.getPlId()).orElseThrow();
-        String objectName = UUID.randomUUID() + "-" + image.getOriginalFilename();
-        uploader.upload(bucketName, objectName, image);
-        String imagePath = objectName;
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() ->
+                new BizException(ErrorCode.NOT_FOUND_USER));
 
-        if (image == null || image.isEmpty()) {
-            log.warn("️업로드된 이미지가 없습니다.");
+        ParkingLot parkingLot = parkingLotRepository.findById(reviewRequestDto.getPlId()).orElseThrow(() ->
+                new BizException(ErrorCode.NOT_FOUND_PKLT));
+
+        String imagePath = null;
+        if (image != null && !image.isEmpty()) {
+            try {
+                String objectName = UUID.randomUUID() + "-" + image.getOriginalFilename();
+                uploader.upload(bucketName, objectName, image);
+                imagePath = objectName;
+            } catch (IOException e) {
+                log.warn("리뷰 이미지 업로드 실패: {}", e.getMessage());
+                throw new BizException(ErrorCode.IMAGE_UPLOAD_ERROR);
+            }
         }
 
         return reviewRepository.save(Review.builder()

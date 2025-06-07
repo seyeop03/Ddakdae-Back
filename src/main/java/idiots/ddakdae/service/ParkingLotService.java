@@ -90,8 +90,8 @@ public class ParkingLotService {
         );
     }
 
-    public NearbyParkingDetailDto getParkingLotDetail(Long id) {
-        return parkingLotRepository.findParkingLotDetailById(id)
-                .orElseThrow(() -> new BizException(ErrorCode.NOTFOUND_PKLT));
+    public NearbyParkingDetailDto getParkingLotDetail(Long plId) {
+        return parkingLotRepository.findParkingLotDetailById(plId)
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_PKLT));
     }
 }

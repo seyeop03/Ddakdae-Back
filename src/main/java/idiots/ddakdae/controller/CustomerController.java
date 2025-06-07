@@ -1,8 +1,10 @@
 package idiots.ddakdae.controller;
 
 import idiots.ddakdae.domain.Customer;
-import idiots.ddakdae.dto.request.CustomerProfileDto;
-import idiots.ddakdae.dto.response.LoginResponseDto;
+import idiots.ddakdae.dto.response.customer.CustomerDetailDto;
+import idiots.ddakdae.dto.response.customer.CustomerProfileDto;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.util.GCSUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,5 +54,42 @@ public class CustomerController {
                 .nickName(customer.getNickName())
                 .profileImageUrl(signedUrl)
                 .build());
+    }
+
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(
+            summary = "현재 로그인 사용자의 상세정보 API",
+            description = "다수 상세정보 반환 DTO 참조, JWT 필수",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "결과 메시지 반환",
+                            content = @Content(schema = @Schema(implementation = CustomerDetailDto.class))
+                    )
+            })
+    @GetMapping("/customer/me/detail")
+    public ResponseEntity<CustomerDetailDto> getCurrentCustomerDetail(@AuthenticationPrincipal Customer customer) {
+
+        if (Objects.isNull(customer)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String imageUrl = null;
+        if (Objects.nonNull(customer.getProfileImage())) {
+            imageUrl = gcsUtil.generateSignedUrl(customer.getProfileImage());
+        }
+
+        CustomerDetailDto dto = CustomerDetailDto.builder()
+                .email(customer.getEmail())
+                .nickName(customer.getNickName())
+                .phone(customer.getPhone())
+                .carNumber(customer.getCarNumber())
+                .carKnd(customer.getCarKnd())
+                .manuCompany(customer.getManuCompany())
+                .profileImageUrl(imageUrl)
+                .carModel(customer.getCarModel())
+                .fuelType(customer.getFuelType())
+                .build();
+        return ResponseEntity.ok(dto);
     }
 }
