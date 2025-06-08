@@ -11,6 +11,8 @@ public enum ErrorCode {
 
     // USER
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
+    INCORRECT_PASSWORD(HttpStatus.BAD_REQUEST, "패스워드가 일치하지 않습니다."),
+    EXIST_SNS_EMAIL(HttpStatus.BAD_REQUEST, "소셜 로그인 전용 계정입니다."),
 
     // Favorite
     NOT_FOUND_PKLT(HttpStatus.NOT_FOUND, "해당 주차장이 존재하지 않습니다."),

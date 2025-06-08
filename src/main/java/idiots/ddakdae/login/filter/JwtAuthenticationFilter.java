@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 log.info("requested JWT: {}", token);
                 Long id = jwtProvider.getUserIdFromToken(token);
-                log.info("parsing completed custId: {}", id);
+//                log.info("parsing completed custId: {}", id);
                 Customer customer = customerRepository.findById(id).orElse(null);
 
                 if (customer == null) {

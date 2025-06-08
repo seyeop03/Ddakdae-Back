@@ -3,6 +3,8 @@ package idiots.ddakdae.login;
 import idiots.ddakdae.domain.Customer;
 import idiots.ddakdae.dto.request.LoginRequestDto;
 import idiots.ddakdae.dto.response.LoginResponseDto;
+import idiots.ddakdae.exception.BizException;
+import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,14 +22,14 @@ public class AuthService {
 
     public LoginResponseDto login(LoginRequestDto requestDto) {
         Customer customer = customerRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_USER));
 
         if (Objects.nonNull(customer.getSnsType())) {
-            throw new IllegalArgumentException("소셜 로그인 전용 계정입니다.");
+            throw new BizException(ErrorCode.EXIST_SNS_EMAIL);
         }
 
         if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BizException(ErrorCode.INCORRECT_PASSWORD);
         }
 
         String token = jwtProvider.createToken(customer.getId());
