@@ -5,19 +5,26 @@ import idiots.ddakdae.domain.Customer;
 import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.domain.Review;
 import idiots.ddakdae.dto.request.ReviewRequestDto;
+import idiots.ddakdae.dto.response.ReviewResponseDto;
 import idiots.ddakdae.exception.BizException;
 import idiots.ddakdae.exception.ErrorCode;
 import idiots.ddakdae.repository.CustomerRepository;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import idiots.ddakdae.repository.ReviewRepository;
+import idiots.ddakdae.util.GCSUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -29,6 +36,7 @@ public class ReviewService {
     private final GCSUploader uploader;
     private final CustomerRepository customerRepository;
     private final ParkingLotRepository parkingLotRepository;
+    private final GCSUtil gcsUtil;
 
     @Value("${spring.cloud.gcp.storage.bucket-name}")
     private String bucketName;
@@ -62,7 +70,25 @@ public class ReviewService {
                 .build());
     }
 
-    public List<Review> getReviews(Long plId) {
-        return reviewRepository.findByParkingLotPlId(plId);
+    public Page<ReviewResponseDto> getReviews(Long plId, int page, int size) {
+        ParkingLot parkingLot = parkingLotRepository.findById(plId)
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_PKLT));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")); // 최신순
+
+        Page<ReviewResponseDto> reviews = reviewRepository.findAllByParkingLotPlId(parkingLot.getPlId(), pageable);
+
+
+        reviews.forEach(reviewResponseDto -> {
+            if (Objects.nonNull(reviewResponseDto.getReviewImagePath())) {
+                reviewResponseDto.setReviewImagePath(gcsUtil.generateSignedUrl(reviewResponseDto.getReviewImagePath()));
+            }
+
+            if (Objects.nonNull(reviewResponseDto.getProfileImagePath())) {
+                reviewResponseDto.setProfileImagePath(gcsUtil.generateSignedUrl(reviewResponseDto.getProfileImagePath()));
+            }
+        });
+
+        return reviews;
     }
 }

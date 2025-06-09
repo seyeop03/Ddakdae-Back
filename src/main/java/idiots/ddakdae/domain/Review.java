@@ -3,6 +3,8 @@ package idiots.ddakdae.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,4 +35,6 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pl_id")
     private ParkingLot parkingLot;
+
+    private LocalDateTime createdAt;
 }

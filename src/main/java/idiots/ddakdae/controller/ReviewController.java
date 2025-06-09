@@ -3,6 +3,8 @@ package idiots.ddakdae.controller;
 import idiots.ddakdae.domain.Customer;
 import idiots.ddakdae.domain.Review;
 import idiots.ddakdae.dto.request.ReviewRequestDto;
+import idiots.ddakdae.dto.response.PageResponse;
+import idiots.ddakdae.dto.response.ReviewResponseDto;
 import idiots.ddakdae.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,8 +54,11 @@ public class ReviewController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공")
     })
-    @GetMapping("/{plId}")
-    public ResponseEntity<?> getReviews(@PathVariable Long plId) {
-        return ResponseEntity.ok(reviewService.getReviews(plId));
+    @GetMapping
+    public ResponseEntity<PageResponse<ReviewResponseDto>> getReviews(
+            @Parameter(example = "1012") @RequestParam Long plId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(new PageResponse<>(reviewService.getReviews(plId, page, size)));
     }
 }
