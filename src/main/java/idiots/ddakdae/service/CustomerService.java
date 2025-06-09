@@ -2,6 +2,7 @@ package idiots.ddakdae.service;
 
 import idiots.ddakdae.config.GCSUploader;
 import idiots.ddakdae.domain.Customer;
+import idiots.ddakdae.dto.request.CustomerUpdateRequestDto;
 import idiots.ddakdae.dto.request.SignUpRequestDto;
 import idiots.ddakdae.exception.BizException;
 import idiots.ddakdae.exception.ErrorCode;
@@ -31,17 +32,7 @@ public class CustomerService {
 
     public void signup(SignUpRequestDto signUpRequestDto, MultipartFile profileImage) throws IOException {
 
-        String imagePath = null;
-        if (profileImage != null && !profileImage.isEmpty()) {
-            try {
-                String objectName = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-                uploader.upload(bucketName, objectName, profileImage);
-                imagePath = objectName;
-            } catch (IOException e) {
-                log.warn("프로필 이미지 업로드 실패: {}", e.getMessage());
-                throw new BizException(ErrorCode.IMAGE_UPLOAD_ERROR);
-            }
-        }
+        String imagePath = uploadImage(profileImage);
 
         Customer customer = Customer.builder()
                 .email(signUpRequestDto.getEmail())
@@ -58,5 +49,41 @@ public class CustomerService {
                 .build();
 
         customerRepository.save(customer);
+    }
+
+    public void updateCustomer(Long custId, CustomerUpdateRequestDto requestDto, MultipartFile profileImage) throws IOException {
+        Customer customer = customerRepository.findById(custId)
+                .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND_USER));
+
+        String imagePath = uploadImage(profileImage);
+        if (imagePath != null) {
+            customer.setProfileImage(imagePath);
+        }
+
+        customer.setNickName(requestDto.getNickName());
+        customer.setPhone(requestDto.getPhone());
+        customer.setCarKnd(requestDto.getCarKnd());
+        customer.setCarNumber(requestDto.getCarNumber());
+        customer.setFuelType(requestDto.getFuelType());
+        customer.setManuCompany(requestDto.getManuCompany());
+        customer.setUpdatedAt(LocalDateTime.now());
+
+        customerRepository.save(customer);
+    }
+
+    private String uploadImage(MultipartFile profileImage) {
+        String imagePath = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                String objectName = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+                uploader.upload(bucketName, objectName, profileImage);
+                imagePath = objectName;
+            } catch (IOException e) {
+                log.warn("프로필 이미지 업로드 실패: {}", e.getMessage());
+                throw new BizException(ErrorCode.IMAGE_UPLOAD_ERROR);
+            }
+        }
+
+        return imagePath;
     }
 }
