@@ -5,12 +5,10 @@ import idiots.ddakdae.domain.ParkingLot;
 import idiots.ddakdae.dto.request.AddressDto;
 import idiots.ddakdae.dto.request.MapBoundsRequest;
 import idiots.ddakdae.dto.request.NearbyParkingRequest;
+import idiots.ddakdae.dto.response.RealTimeParkingResponseDto;
 import idiots.ddakdae.dto.response.ResponseDto;
 import idiots.ddakdae.dto.response.clustering.*;
-import idiots.ddakdae.service.GeocodeService;
-import idiots.ddakdae.service.KakaoMapService;
-import idiots.ddakdae.service.NaverMapService;
-import idiots.ddakdae.service.ParkingLotService;
+import idiots.ddakdae.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +34,7 @@ public class GeocodeController {
     private final ParkingLotService parkingLotService;
     private final KakaoMapService kakaoMapService;
     private final NaverMapService naverMapService;
+    private final PkltRealTimeService pkltRealTimeService;
 
     @Operation(
             summary = "첫 메인화면 지도 클러스터링",
@@ -57,6 +56,7 @@ public class GeocodeController {
         List<?> clusteredData = parkingLotService.getClusteredData(mapBoundsRequest);
         return ResponseEntity.ok(clusteredData);
     }
+
     @Operation(
             summary = "주차장 목록",
             description = "주차장 목록 API, 클릭 시 상세정보 API로 연결됨",
@@ -73,6 +73,7 @@ public class GeocodeController {
         Page<NearbyParkingDto> nearbyParkingLots = parkingLotService.getNearbyParkingLots(req);
         return ResponseEntity.ok(nearbyParkingLots);
     }
+
     @Operation(
             summary = "주차장 상세 목록",
             description = "주차장 상세 목록 API",
@@ -122,5 +123,21 @@ public class GeocodeController {
             @RequestParam(defaultValue = "random") String sort) {
         Object result = naverMapService.searchLocal(query, display, start, sort);
         return ResponseEntity.ok(result);
+    }
+
+
+    @Operation(
+            summary = "5분 주기 현재 주차 차량 수 업데이트 API",
+            description = "연계 데이터 약 100건으로 작음, 프론트에서 setInterval 처리 가능할 듯",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "현재 주차 차량 수 업데이트 주차장 목록 결과",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RealTimeParkingResponseDto.class)))
+                    )
+            })
+    @GetMapping("pklt/realtime")
+    public List<?> getAllRealTimePkltData() {
+        return pkltRealTimeService.getAll();
     }
 }
