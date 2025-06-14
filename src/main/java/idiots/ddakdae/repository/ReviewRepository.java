@@ -12,7 +12,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("""
         SELECT new idiots.ddakdae.dto.response.ReviewResponseDto(
             r.comment, r.star, r.description, r.reviewImagePath,
-            c.nickName, c.profileImage
+            c.nickName, c.profileImage, r.createdAt
         )
         FROM Review r
         INNER JOIN r.customer c

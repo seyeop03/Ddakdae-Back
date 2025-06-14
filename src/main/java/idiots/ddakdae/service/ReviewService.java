@@ -12,6 +12,7 @@ import idiots.ddakdae.repository.CustomerRepository;
 import idiots.ddakdae.repository.ParkingLotRepository;
 import idiots.ddakdae.repository.ReviewRepository;
 import idiots.ddakdae.util.GCSUtil;
+import idiots.ddakdae.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -67,6 +71,7 @@ public class ReviewService {
                 .star(reviewRequestDto.getStar())
                 .description(reviewRequestDto.getDesc())
                 .reviewImagePath(imagePath)
+                .createdAt(LocalDateTime.now())
                 .build());
     }
 
@@ -86,6 +91,13 @@ public class ReviewService {
 
             if (Objects.nonNull(reviewResponseDto.getProfileImagePath())) {
                 reviewResponseDto.setProfileImagePath(gcsUtil.generateSignedUrl(reviewResponseDto.getProfileImagePath()));
+            }
+
+            if (Objects.nonNull(reviewResponseDto.getCreatedAt())) {
+                Instant instant = reviewResponseDto.getCreatedAt()
+                        .atZone(ZoneId.of("Asia/Seoul"))
+                        .toInstant();
+                reviewResponseDto.setCreatedAtFormatted(TimeUtil.formatDateWithDay(instant));
             }
         });
 
