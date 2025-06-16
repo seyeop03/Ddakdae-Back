@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Schema(description = "리뷰 상세정보 DTO")
 public class ReviewResponseDto {
 
+    @Schema
+    private Long reviewId;
+
     @Schema(description = "리뷰 코멘트")
     private String comment;
 
@@ -37,9 +40,10 @@ public class ReviewResponseDto {
     @Schema(description = "리뷰 작성일(가공)")
     private String createdAtFormatted;
 
-    public ReviewResponseDto(String comment, int star, String description,
+    public ReviewResponseDto(Long reviewId, String comment, int star, String description,
                              String reviewImagePath, String nickName,
                              String profileImagePath, LocalDateTime createdAt) {
+        this.reviewId = reviewId;
         this.comment = comment;
         this.star = star;
         this.description = description;
